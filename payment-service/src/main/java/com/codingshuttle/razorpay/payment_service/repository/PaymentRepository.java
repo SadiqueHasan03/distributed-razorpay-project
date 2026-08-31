@@ -3,6 +3,7 @@ package com.codingshuttle.razorpay.payment_service.repository;
 import com.codingshuttle.razorpay.common_lib.enums.PaymentStatus;
 import com.codingshuttle.razorpay.payment_service.entity.OrderRecord;
 import com.codingshuttle.razorpay.payment_service.entity.Payment;
+import io.micrometer.observation.ObservationFilter;
 import jakarta.persistence.LockModeType;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Lock;
@@ -31,4 +32,6 @@ public interface PaymentRepository extends JpaRepository<Payment, UUID> {
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     @Query("select p from Payment p where p.merchantId = :merchantId and p.status = :paymentStatus and p.settledAt is null")
     List<Payment> findByMerchantIdAndStatusForUpdate(UUID merchantId, PaymentStatus paymentStatus);
+
+    Optional<Payment> findByMerchantIdAndIdempotencyKey(UUID merchantId, String idempotencyKey);
 }
